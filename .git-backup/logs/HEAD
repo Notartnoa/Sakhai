@@ -1,5 +1,0 @@
-0000000000000000000000000000000000000000 b490be160668c45cef8417d7ae4126aff16f3ff1 Notartnoa <pradanamauludin@gmail.com> 1765087687 +0700	commit (initial): Initial commit
-b490be160668c45cef8417d7ae4126aff16f3ff1 0000000000000000000000000000000000000000 Notartnoa <pradanamauludin@gmail.com> 1765087703 +0700	Branch: renamed refs/heads/master to refs/heads/main
-0000000000000000000000000000000000000000 b490be160668c45cef8417d7ae4126aff16f3ff1 Notartnoa <pradanamauludin@gmail.com> 1765087703 +0700	Branch: renamed refs/heads/master to refs/heads/main
-b490be160668c45cef8417d7ae4126aff16f3ff1 630539e8fb003c39dcc4a9a9337836a4ecede2d9 Notartnoa <pradanamauludin@gmail.com> 1765087898 +0700	commit: Trigger refresh
-630539e8fb003c39dcc4a9a9337836a4ecede2d9 6b3bd416dcbde0bead169f642da2ee9124b83bed Notartnoa <pradanamauludin@gmail.com> 1765092858 +0700	commit: feat: integrate Midtrans payment & update dark theme UI

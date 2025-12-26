@@ -15,6 +15,9 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    {{-- Additional Styles from child views --}}
+    @stack('styles')
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -152,13 +155,6 @@
 
                     {{-- User Dropdown --}}
                     <div class="flex items-center gap-4">
-                        {{-- <a href="{{ route('front.index') }}" class="text-sm text-[#A0A0A0] hover:text-white flex items-center gap-2 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                            </svg>
-                            View Store
-                        </a> --}}
-
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#2A2A2A] transition-colors">
                                 <img src="{{ Auth::user()->avatar ? Storage::url(Auth::user()->avatar) : asset('images/default-avatar.png') }}"
@@ -173,7 +169,7 @@
                                 </svg>
                             </button>
 
-                            {{-- Dropdown Menu - dengan x-cloak --}}
+                            {{-- Dropdown Menu --}}
                             <div x-show="open"
                                  x-cloak
                                  @click.away="open = false"
@@ -233,6 +229,9 @@
             });
         }
     </script>
+
+    {{-- Additional Scripts from child views (untuk Chart.js dll) --}}
+    @stack('scripts')
 </body>
 
 </html>

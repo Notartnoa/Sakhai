@@ -91,6 +91,67 @@
         </div>
     </div>
 
+    {{-- Earning History Charts --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {{-- Daily Earnings Chart (Last 30 Days) --}}
+        <div class="bg-[#1E1E1E] rounded-2xl p-6 border border-[#2A2A2A]">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Daily Earnings</h3>
+                    <p class="text-sm text-[#A0A0A0]">Last 30 days</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1">
+                        <div class="w-3 h-3 rounded-full bg-[#2D68F8]"></div>
+                        <span class="text-xs text-[#A0A0A0]">Revenue</span>
+                    </div>
+                </div>
+            </div>
+            <div class="h-64">
+                <canvas id="dailyEarningsChart"></canvas>
+            </div>
+            <div class="mt-4 pt-4 border-t border-[#2A2A2A]">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-[#A0A0A0]">Total (30 days)</span>
+                    <span class="font-semibold text-white">Rp {{ number_format(array_sum($earningHistory['data']), 0, ',', '.') }}</span>
+                </div>
+                <div class="flex items-center justify-between text-sm mt-1">
+                    <span class="text-[#A0A0A0]">Orders (30 days)</span>
+                    <span class="font-semibold text-white">{{ array_sum($earningHistory['orders']) }} orders</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Monthly Earnings Chart (Last 12 Months) --}}
+        <div class="bg-[#1E1E1E] rounded-2xl p-6 border border-[#2A2A2A]">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Monthly Earnings</h3>
+                    <p class="text-sm text-[#A0A0A0]">Last 12 months</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1">
+                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        <span class="text-xs text-[#A0A0A0]">Revenue</span>
+                    </div>
+                </div>
+            </div>
+            <div class="h-64">
+                <canvas id="monthlyEarningsChart"></canvas>
+            </div>
+            <div class="mt-4 pt-4 border-t border-[#2A2A2A]">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-[#A0A0A0]">Total (12 months)</span>
+                    <span class="font-semibold text-white">Rp {{ number_format(array_sum($monthlyEarningHistory['data']), 0, ',', '.') }}</span>
+                </div>
+                <div class="flex items-center justify-between text-sm mt-1">
+                    <span class="text-[#A0A0A0]">Orders (12 months)</span>
+                    <span class="font-semibold text-white">{{ array_sum($monthlyEarningHistory['orders']) }} orders</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Quick Actions --}}
     <div class="bg-[#1E1E1E] rounded-2xl p-6 border border-[#2A2A2A] mb-8">
         <h3 class="text-lg font-semibold text-white mb-4">Quick Actions</h3>
@@ -168,4 +229,185 @@
         </div>
     </div>
     @endif
+
+    {{-- Chart.js CDN --}}
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart.js default configuration for dark theme
+            Chart.defaults.color = '#A0A0A0';
+            Chart.defaults.borderColor = '#2A2A2A';
+
+            // Daily Earnings Chart
+            const dailyCtx = document.getElementById('dailyEarningsChart').getContext('2d');
+            new Chart(dailyCtx, {
+                type: 'line',
+                data: {
+                    labels: @json($earningHistory['labels']),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: @json($earningHistory['data']),
+                        borderColor: '#2D68F8',
+                        backgroundColor: 'rgba(45, 104, 248, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#2D68F8',
+                        pointBorderColor: '#2D68F8',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#2D68F8',
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                        tooltip: {
+                            backgroundColor: '#1E1E1E',
+                            titleColor: '#fff',
+                            bodyColor: '#A0A0A0',
+                            borderColor: '#2A2A2A',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    const orders = @json($earningHistory['orders'])[context.dataIndex];
+                                    return [
+                                        'Revenue: Rp ' + new Intl.NumberFormat('id-ID').format(value),
+                                        'Orders: ' + orders
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                            },
+                            ticks: {
+                                maxTicksLimit: 7,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#2A2A2A',
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+                                    } else if (value >= 1000) {
+                                        return 'Rp ' + (value / 1000).toFixed(0) + 'K';
+                                    }
+                                    return 'Rp ' + value;
+                                },
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Monthly Earnings Chart
+            const monthlyCtx = document.getElementById('monthlyEarningsChart').getContext('2d');
+            new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: @json($monthlyEarningHistory['labels']),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: @json($monthlyEarningHistory['data']),
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderColor: '#10B981',
+                        borderWidth: 0,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                        tooltip: {
+                            backgroundColor: '#1E1E1E',
+                            titleColor: '#fff',
+                            bodyColor: '#A0A0A0',
+                            borderColor: '#2A2A2A',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    const orders = @json($monthlyEarningHistory['orders'])[context.dataIndex];
+                                    return [
+                                        'Revenue: Rp ' + new Intl.NumberFormat('id-ID').format(value),
+                                        'Orders: ' + orders
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                            },
+                            ticks: {
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#2A2A2A',
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+                                    } else if (value >= 1000) {
+                                        return 'Rp ' + (value / 1000).toFixed(0) + 'K';
+                                    }
+                                    return 'Rp ' + value;
+                                },
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    @endpush
 </x-app-layout>
